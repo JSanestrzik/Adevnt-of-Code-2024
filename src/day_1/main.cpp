@@ -6,7 +6,6 @@
 #include <numeric>
 #include <fstream>
 #include <string>
-#include <iterator>
 
 template <typename Func>
 void read_input_from_file(std::ifstream &f_stream, Func func) {
@@ -44,7 +43,7 @@ long calculate_similarity_score(std::vector<long> &lhs, std::vector<long> &rhs) 
 }
 
 int main() {
-    std::cout << "Advent of code 2024" << std::endl;
+    std::cout << "Advent of code 2024 Day 1" << std::endl;
 
     std::ifstream Input("../../resources/input_day1_1.txt");
     

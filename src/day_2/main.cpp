@@ -1,12 +1,9 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
 #include <cassert>
 #include <cmath>
-#include <numeric>
 #include <fstream>
 #include <string>
-#include <iterator>
 
 template <typename Func>
 void read_input_from_file(std::ifstream &f_stream, Func func) {
@@ -69,7 +66,7 @@ long calculate_valid_reports(std::vector<std::vector<long>> &reports) {
 }
 
 int main() {
-    std::cout << "Advent of code 2024" << std::endl;
+    std::cout << "Advent of code 2024 Day 2" << std::endl;
 
     std::ifstream Reposts("../../resources/input_day2_1.txt");
     std::vector<std::vector<long>> reports;

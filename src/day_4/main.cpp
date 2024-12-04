@@ -2,8 +2,6 @@
 #include <vector>
 #include <fstream>
 #include <string>
-#include <regex>
-#include <numeric>
 
 template <typename Func>
 void read_input_from_file(std::ifstream &f_stream, Func func) {
@@ -14,41 +12,62 @@ void read_input_from_file(std::ifstream &f_stream, Func func) {
     }
 }
 
-long calculate_program_mul_sum(std::vector<std::string> &lines) {
-    const std::regex exp(R"(mul\((\d+),(\d+)\)|do\(\)|don't\(\))");
-    long mul_sum = 0;
-    bool enable_multiplication = true;
+bool check_for_word(const std::vector<std::vector<char>> word_grid, 
+        const std::string &word, 
+        int x, 
+        int y, 
+        int dx, 
+        int dy) {
+    const int width = word_grid.size();
+    const int height = word_grid[0].size();
+    const int word_len = word.size();
 
-    for(auto const &line : lines) {
-        auto begin = std::sregex_iterator(line.begin(), line.end(), exp);
-        auto end = std::sregex_iterator();
+    for (int i = 0; i < word_len; i++) {
+        int x_pos = x + i * dx;
+        int y_pos = y + i * dy;
 
-        mul_sum += std::transform_reduce(begin, end, 0L, std::plus<>(), [&](const std::smatch &match) {
-            if (match.str(0) == "don't()") {
-                enable_multiplication = false;
-            } else if (match.str(0) == "do()") {
-                enable_multiplication = true;
-            } else if (enable_multiplication && match[1].matched && match[2].matched) {
-                return std::stol(match.str(1)) * std::stol(match.str(2));
-            }
-            return 0L;
-        });
+        if(x_pos < 0 || x_pos >= width || y_pos < 0 || y_pos >= height || word_grid[x_pos][y_pos] != word[i]) {
+            return false;
+        }
     }
-    return mul_sum;
+
+    return true;
+}
+
+long match_count(const std::vector<std::vector<char>> &word_grid, const std::string &word) {
+    const std::vector<std::pair<int, int>> directions = {{0, 1}, {1, 0}, {1, 1}, {1, -1}};
+    long match_count = 0;
+    
+    const int width = word_grid.size();
+    const int height = word_grid[0].size();
+
+    const std::string reverse_word(word.rbegin(), word.rend()); 
+    for(int x = 0; x < width; x++) {
+        for(int y = 0; y < height; y++) {
+            for(auto[dx, dy] : directions) { 
+                if (check_for_word(word_grid, word, x, y, dx, dy) || check_for_word(word_grid, reverse_word, x, y, dx, dy)) {
+                    match_count++;
+                }
+            }
+        }
+    }
+
+    return match_count;
 }
 
 int main() {
     std::cout << "Advent of code 2024 Day 3" << std::endl;
 
-    std::ifstream input("../../resources/input_day3_1.txt");
+    std::ifstream input("../../resources/input_day4_1.txt");
 
-    std::vector<std::string> program;
+    std::vector<std::vector<char>> word_grid;
     read_input_from_file(input, [&](std::string line) {
-        program.emplace_back(line);
+        word_grid.emplace_back(std::vector(line.begin(), line.end()));
     });
 
-    long mul_sum = calculate_program_mul_sum(program);
-    std::cout << "Program mul sum: " << mul_sum << std::endl;
+    long word_count = 0;
+    word_count = match_count(word_grid, "XMAS");
+    std::cout << "XMAS match count: " << word_count << std::endl;
 
     input.close();
     return 0;
